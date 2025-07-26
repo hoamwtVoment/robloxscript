@@ -1,3 +1,5 @@
+-- 嗯对，我去你的。嗯。谁能教我怎么寻找自己的角色，，。额。不然我只能全删一遍了。
+
 -- 要删除的对象名称列表
 local targetNames = {"SlowedStatus", "BeheadAbility", "HitRegistered"}
 
