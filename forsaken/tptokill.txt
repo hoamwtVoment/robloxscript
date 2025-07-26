@@ -1,3 +1,5 @@
+-- 二改，，脚本，，嗯。我是错误的，躲避球！，，，
+
 repeat task.wait() until game:IsLoaded();
 
 -- 创建UI控制面板
