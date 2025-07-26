@@ -1,3 +1,6 @@
+-- 嗯。这个脚本会让你变成微调哥。。嗯对。狂豹也可以直接走，还有伤口，，，因为我小号没多玩变压器。。。所以只有杰森
+-- ，嗯对，你动的。
+
 -- 目标路径和值设置
 local targetPath = "Players.Killers.Jason.SpeedMultipliers"
 local valueConfigs = {
