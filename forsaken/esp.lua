@@ -1,3 +1,5 @@
+-- 嗯。我很懒。嗯、。对，谁给我面粉1的。ui
+
 local function createESP(character, color, name)
     -- 创建高亮效果
     local highlight = Instance.new("Highlight")
