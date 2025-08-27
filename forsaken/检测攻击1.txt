@@ -1,0 +1,272 @@
+-- 本地玩家和核心服务
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+-- 攻击动画列表
+-- 额，应该是所有莎手的攻击，我从冲刺攻击那偷的，好像没有移动速度覆盖
+local AttackAnimations = {
+	'rbxassetid://131430497821198', --// MassInfection, 1x1x1x1
+	'rbxassetid://83829782357897', --// Slash, 1x1x1x1
+	'rbxassetid://126830014841198', --// Slash, Jason
+	'rbxassetid://126355327951215', --// Behead, Jason
+	'rbxassetid://121086746534252', --// GashingWoundStart, Jason
+	'rbxassetid://105458270463374', --// Slash, JohnDoe
+	'rbxassetid://127172483138092', --// CorruptEnergy, JohnDoe
+	'rbxassetid://18885919947', --// CorruptNature, c00lkidd
+	'rbxassetid://18885909645', --// Attack, c00lkidd
+	'rbxassetid://94162446513587', --// Slash, JohnDoe, Skin: !Joner
+	'rbxassetid://84426150435898', --// CorruptEnergy, JohnDoe, Skin: !Joner
+	'rbxassetid://93069721274110', --// Slash, JohnDoe, Skin: AnnihilationJohnDoe
+	'rbxassetid://114620047310688', --// CorruptEnergy, JohnDoe, Skin: AnnihilationJohnDoe
+	'rbxassetid://97433060861952', --// Slash, JohnDoe, Skin: #SK
+	'rbxassetid://82183356141401', --// CorruptEnergy, JohnDoe, Skin: #SK
+	'rbxassetid://100592913030351', --// MassInfection, 1x1x1x1, Skin: Fleskhjerta1x1x1x1
+	'rbxassetid://121293883585738', --// Slash, 1x1x1x1, Skin: Fleskhjerta1x1x1x1
+	'rbxassetid://100592913030351', --// MassInfection, 1x1x1x1, Skin: AceOfSpades1x1x1x1
+	'rbxassetid://121293883585738', --// Slash, 1x1x1x1, Skin: AceOfSpades1x1x1x1
+	'rbxassetid://100592913030351', --// MassInfection, 1x1x1x1, Skin: Lancer1x1x1x1
+	'rbxassetid://121293883585738', --// Slash, 1x1x1x1, Skin: Lancer1x1x1x1
+	'rbxassetid://70447634862911', --// MassInfection, 1x1x1x1, Skin: Hacklord1x1x1x1
+	'rbxassetid://92173139187970', --// Slash, 1x1x1x1, Skin: Hacklord1x1x1x1
+	'rbxassetid://106847695270773', --// GashingWoundStart, Jason, Skin: Subject0Jason
+	'rbxassetid://125403313786645', --// Slash, Jason, Skin: Subject0Jason
+	'rbxassetid://81639435858902', --// Behead, Jason, Skin: WhitePumpkinJason
+	'rbxassetid://137314737492715', --// GashingWoundStart, Jason, Skin: WhitePumpkinJason
+	'rbxassetid://120112897026015', --// Slash, Jason, Skin: WhitePumpkinJason
+	'rbxassetid://82113744478546', --// Behead, Jason, Skin: KillerKyleJason
+	'rbxassetid://118298475669935', --// Slash, Jason, Skin: KillerKyleJason
+	'rbxassetid://82113744478546', --// Behead, Jason, Skin: #SmartestJason
+	'rbxassetid://118298475669935', --// Slash, Jason, Skin: #SmartestJason
+	'rbxassetid://126681776859538', --// Behead, Jason, Skin: PursuerJason
+	'rbxassetid://129976080405072', --// GashingWoundStart, Jason, Skin: PursuerJason
+	'rbxassetid://109667959938617', --// Slash, Jason, Skin: PursuerJason
+	'rbxassetid://74707328554358', --// Slash, Jason, Skin: #DeadRabbitsJason
+	'rbxassetid://133336594357903', --// Behead, Jason, Skin: #DeadRabbitsJason
+	'rbxassetid://86204001129974', --// GashingWoundStart, Jason, Skin: #DeadRabbitsJason
+	'rbxassetid://82113744478546', --// Behead, Jason, Skin: RetroJason
+	'rbxassetid://118298475669935', --// Slash, Jason, Skin: RetroJason
+	'rbxassetid://124243639579224', --// CorruptNature, c00lkidd, Skin: MafiosoC00l
+	'rbxassetid://70371667919898', --// Attack, c00lkidd, Skin: MafiosoC00l
+	'rbxassetid://131543461321709', --// Attack, c00lkidd, Skin: SaviorC00l
+	'rbxassetid://136323728355613', --// Swing, Noli
+    'rbxassetid://109230267448394', --// Swing, Noli, Skin: Devesto
+    'rbxassetid://109230267448394', --// Swing, Noli, Skin: Yourself
+    'rbxassetid://109230267448394', --// Swing, Noli, Skin: YAAI
+    'rbxassetid://109230267448394', --// Swing, Noli, Skin: Toolbox
+    'rbxassetid://109230267448394', --// Swing, Noli, Skin: ASPX
+    'rbxassetid://109230267448394', --// Swing, Noli, Skin: RedRoomCurse
+    'rbxassetid://109230267448394', --// Swing, Noli, Skin: Saggitial
+    'rbxassetid://109230267448394', --// Swing, Noli, Skin: Quimera
+    'rbxassetid://109230267448394', --// Swing, Noli, Skin: 035
+    'rbxassetid://109230267448394', --// Swing, Noli, Skin: Artful
+    'rbxassetid://109230267448394', --// Swing, Noli, Skin: Robert
+    'rbxassetid://109230267448394', --// Swing, Noli, Skin: Ephialtes
+    'rbxassetid://109230267448394' --// Swing, Noli, Skin: Umbra
+};
+
+-- 配置变量
+local detectionRange = 20
+local trackingKillers = {}
+local circleAdorn = nil
+
+-- 创建GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "DetectionRangeGUI"
+screenGui.Parent = PlayerGui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 200, 0, 100)
+frame.Position = UDim2.new(0.5, -100, 0, 10)
+frame.BackgroundTransparency = 0.7
+frame.BackgroundColor3 = Color3.new(0, 0, 0)
+frame.Parent = screenGui
+
+local label = Instance.new("TextLabel")
+label.Text = "检测范围(米):"
+label.Size = UDim2.new(0.9, 0, 0.3, 0)
+label.Position = UDim2.new(0.05, 0, 0.1, 0)
+label.BackgroundTransparency = 1
+label.TextColor3 = Color3.new(1, 1, 1)
+label.Parent = frame
+
+local textBox = Instance.new("TextBox")
+textBox.Text = tostring(detectionRange)
+textBox.Size = UDim2.new(0.5, 0, 0.3, 0)
+textBox.Position = UDim2.new(0.5, 0, 0.1, 0)
+textBox.BackgroundColor3 = Color3.new(1, 1, 1)
+textBox.TextColor3 = Color3.new(0, 0, 0)
+textBox.Parent = frame
+
+local button = Instance.new("TextButton")
+button.Text = "应用"
+button.Size = UDim2.new(0.9, 0, 0.3, 0)
+button.Position = UDim2.new(0.05, 0, 0.5, 0)
+button.BackgroundColor3 = Color3.new(0.3, 0.6, 1)
+button.TextColor3 = Color3.new(1, 1, 1)
+button.Parent = frame
+
+-- 创建/更新范围圈（修复版）
+local function updateRangeCircle()
+    local character = LocalPlayer.Character
+    if not character then return end
+    
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if not humanoidRootPart then return end
+    
+    -- 删除旧装饰（如果存在）
+    if circleAdorn then
+        circleAdorn:Destroy()
+    end
+    
+    -- 创建新的装饰物
+    circleAdorn = Instance.new("CylinderHandleAdornment")
+    circleAdorn.Name = "DetectionRangeCircle"
+    circleAdorn.Adornee = humanoidRootPart
+    circleAdorn.AlwaysOnTop = true
+    circleAdorn.ZIndex = 1
+    circleAdorn.Transparency = 0.5
+    circleAdorn.Color3 = Color3.new(1, 1, 0) -- 黄色
+    circleAdorn.Height = 0.2 -- 圆圈厚度
+    circleAdorn.Radius = detectionRange
+    circleAdorn.CFrame = CFrame.new(Vector3.new(0, -2.5, 0)) -- 调整到脚下位置
+    circleAdorn.Parent = humanoidRootPart
+end
+
+-- 检查是否在幸存者目录下
+local function isSurvivor()
+    local character = LocalPlayer.Character
+    if not character then return false end
+    
+    local survivorsFolder = workspace:FindFirstChild("Players") and 
+                           workspace.Players:FindFirstChild("Survivors")
+    
+    return survivorsFolder and character:IsDescendantOf(survivorsFolder)
+end
+
+-- 获取杀手角色
+local function getKillers()
+    local killers = {}
+    local killersFolder = workspace:FindFirstChild("Players") and 
+                         workspace.Players:FindFirstChild("Killers")
+    
+    if killersFolder then
+        for _, model in ipairs(killersFolder:GetChildren()) do
+            if model:IsA("Model") and model:FindFirstChild("Humanoid") then
+                table.insert(killers, model)
+            end
+        end
+    end
+    return killers
+end
+
+-- 检查动画是否在攻击列表中
+local function isAttackAnimation(animationId)
+    for _, id in ipairs(AttackAnimations) do
+        if id == animationId then
+            return true
+        end
+    end
+    return false
+end
+
+-- 追踪杀手的动画播放
+local function trackKillerAnimation(killer)
+    if trackingKillers[killer] then return end
+    
+    local humanoid = killer:FindFirstChild("Humanoid")
+    if not humanoid then return end
+    
+    local animator = humanoid:FindFirstChildOfClass("Animator")
+    if not animator then return end
+    
+    trackingKillers[killer] = true
+    
+    animator.AnimationPlayed:Connect(function(track)
+        if isAttackAnimation(track.Animation.AnimationId) then
+            -- 等待动画播放到75%
+            while track.IsPlaying and track.TimePosition < track.Length * 0.5 do
+                RunService.Heartbeat:Wait()
+            end
+            
+            if track.IsPlaying then
+                print("1") -- 检测到攻击动画播放到75%
+            end
+        end
+    end)
+end
+
+-- 主检测循环
+local function detectionLoop()
+    while true do
+        -- 更新范围圈
+        if isSurvivor() then
+            if not circleAdorn or not circleAdorn.Parent then
+                updateRangeCircle()
+            end
+        else
+            if circleAdorn then
+                circleAdorn:Destroy()
+                circleAdorn = nil
+            end
+        end
+        
+        -- 只有在幸存者模式下才检测
+        if isSurvivor() then
+            local killers = getKillers()
+            local character = LocalPlayer.Character
+            local playerPos = character and character:FindFirstChild("HumanoidRootPart") and 
+                             character.HumanoidRootPart.Position
+            
+            if playerPos then
+                for _, killer in ipairs(killers) do
+                    local rootPart = killer:FindFirstChild("HumanoidRootPart")
+                    if rootPart then
+                        local distance = (rootPart.Position - playerPos).Magnitude
+                        if distance <= detectionRange then
+                            trackKillerAnimation(killer)
+                        end
+                    end
+                end
+            end
+        end
+        
+        -- 清理不再需要追踪的杀手
+        for killer in pairs(trackingKillers) do
+            if not killer:IsDescendantOf(workspace) then
+                trackingKillers[killer] = nil
+            end
+        end
+        
+        RunService.Heartbeat:Wait()
+    end
+end
+
+-- GUI事件处理
+local function updateDetectionRange()
+    local newRange = tonumber(textBox.Text)
+    if newRange and newRange > 0 then
+        detectionRange = newRange
+        updateRangeCircle()
+    else
+        textBox.Text = tostring(detectionRange)
+    end
+end
+
+textBox.FocusLost:Connect(updateDetectionRange)
+button.MouseButton1Click:Connect(updateDetectionRange)
+
+-- 角色变化时重新创建范围圈
+LocalPlayer.CharacterAdded:Connect(function(character)
+    character:WaitForChild("HumanoidRootPart")
+    updateRangeCircle()
+end)
+
+-- 初始化
+if LocalPlayer.Character then
+    updateRangeCircle()
+end
+task.spawn(detectionLoop)
+
+print("杀手动画检测系统已启动！")
